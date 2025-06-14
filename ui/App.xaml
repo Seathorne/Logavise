@@ -1,0 +1,8 @@
+﻿<Application
+    x:Class="Logavise.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:Logavise"
+    StartupUri="ui\MainWindow.xaml">
+    <Application.Resources />
+</Application>
