@@ -1,8 +1,10 @@
 ﻿using Microsoft.Win32;
+
 using System;
+using System.Collections.ObjectModel;
 using System.IO;
-using System.Reflection.Metadata;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace Logavise
@@ -11,20 +13,41 @@ namespace Logavise
     {
         private int previousLineNumber;
         
+        private int editorFilesNameIndex = 1;
+        private int prevSelectedTabIndex = 0;
+
+        public ICommand NewFileCommand { get; private set; }
         public ICommand OpenFileCommand { get; private set; }
 
+        public ObservableCollection<TabModel> EditorTabs { get; private set; }
 
         public MainWindow()
         {
             InitializeComponent();
             DataContext = this; // For XAML binding to work
 
+            NewFileCommand = new RelayCommand(NewFile);
             OpenFileCommand = new RelayCommand(OpenFile);
+
+            EditorTabs = new ObservableCollection<TabModel>()
+            {
+                new TabModel() { Header = "new 1", Index = 0, Text = "" }
+            };
+            tabControl.SelectedIndex = 0;
 
             textEditor.TextArea.Caret.PositionChanged += Caret_PositionChanged;
         }
 
         #region Private Methods
+
+        private void NewFile()
+        {
+            editorFilesNameIndex += 1;
+
+            int newIndex = EditorTabs.Count;
+            EditorTabs.Add(new TabModel() { Header = $"new {editorFilesNameIndex}", Index = newIndex, Text = "" });
+            tabControl.SelectedIndex = newIndex; // this automatically saves the current file then switches to the new tab
+        }
 
         private void OpenFile()
         {
@@ -33,9 +56,25 @@ namespace Logavise
             {
                 using FileStream fs = new FileStream(openFileDialog.FileName, FileMode.Open, FileAccess.ReadWrite);
                 using StreamReader reader = new StreamReader(fs);
-                textEditor.Text = reader.ReadToEnd();
 
+                int newIndex = EditorTabs.Count;
+                EditorTabs.Add(new TabModel() { Header = openFileDialog.FileName, Index = newIndex, Text = reader.ReadToEnd() });
+                tabControl.SelectedIndex = newIndex; // this automatically saves the current file then opens this file
             }
+        }
+
+        private void SaveFile()
+        {
+            if (textEditor.Text != "")
+            {
+                // store previous tab's text
+                EditorTabs[prevSelectedTabIndex].Text = textEditor.Text;
+            }
+        }
+
+        private void LoadFile(int index)
+        {
+            textEditor.Text = EditorTabs[index].Text;
         }
 
         private void SendConsoleLine(string text)
@@ -84,8 +123,6 @@ namespace Logavise
             }
         }
 
-        #endregion
-
         private void consoleEditor_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Tab)
@@ -94,6 +131,50 @@ namespace Logavise
                 e.Handled = true;
             }
         }
+
+        private void CloseTabButton_Click(object sender, RoutedEventArgs e)
+        {
+            int index = (int)(sender as Button).Tag;
+            if (EditorTabs.Count > 1)
+            {
+                foreach (var tab in EditorTabs)
+                {
+                    if (tab.Index > index)
+                    {
+                        tab.Index--;
+                    }
+                }
+
+                if (prevSelectedTabIndex > index)
+                {
+                    prevSelectedTabIndex--;
+                }
+
+                if (tabControl.SelectedIndex == index)
+                {
+                    SaveFile();
+                    LoadFile((index + 1) % EditorTabs.Count);
+                }
+                EditorTabs.RemoveAt(index); // this has to come second because it kicks off tabControl_SelectionChanged.
+            }
+        }
+
+        private void tabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            int newIndex = (sender as TabControl).SelectedIndex;
+            if (newIndex != prevSelectedTabIndex)
+            {
+                SaveFile();
+            }
+            if (newIndex >= 0)
+            {
+                LoadFile(newIndex);
+
+                prevSelectedTabIndex = tabControl.SelectedIndex;
+            }
+        }
+
+        #endregion
     }
 }
 
