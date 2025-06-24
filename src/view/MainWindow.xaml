@@ -9,12 +9,25 @@
     Height="450"
     MinWidth="380"
     MinHeight="261">
+    <Window.InputBindings>
+        <KeyBinding Key="N" Modifiers="Ctrl" Command="{Binding NewFileCommand}" />
+        <KeyBinding Key="O" Modifiers="Ctrl" Command="{Binding OpenFileCommand}" />
+        <KeyBinding Key="S" Modifiers="Ctrl" Command="{Binding SaveFileCommand}" />
+        <KeyBinding Key="S" Modifiers="Ctrl+Shift" Command="{Binding SaveFileAsCommand}" />
+    </Window.InputBindings>
+
     <DockPanel Background="GhostWhite">
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
-                <MenuItem Command="{Binding NewFileCommand}" Header="New" />
-                <MenuItem Command="{Binding OpenFileCommand}" Header="Open…" />
-                <MenuItem Header="Save" />
+                <MenuItem Command="{Binding NewFileCommand}" Header="_New">
+                    <MenuItem.InputGestureText>Ctrl+N</MenuItem.InputGestureText>
+                </MenuItem>
+                <MenuItem Command="{Binding OpenFileCommand}" Header="_Open…">
+                    <MenuItem.InputGestureText>Ctrl+O</MenuItem.InputGestureText>
+                </MenuItem>
+                <MenuItem Command="{Binding SaveFileCommand}" Header="Save">
+                    <MenuItem.InputGestureText>Ctrl+S</MenuItem.InputGestureText>
+                </MenuItem>
                 <MenuItem Header="Save As…" />
                 <MenuItem Header="Save All" />
                 <MenuItem Header="Close" />

@@ -18,6 +18,8 @@ namespace Logavise
 
         public ICommand NewFileCommand { get; private set; }
         public ICommand OpenFileCommand { get; private set; }
+        public ICommand SaveFileCommand { get; private set; }
+        public ICommand SaveFileAsCommand { get; private set; }
 
         public ObservableCollection<TabModel> EditorTabs { get; private set; }
 
@@ -28,6 +30,8 @@ namespace Logavise
 
             NewFileCommand = new RelayCommand(NewFile);
             OpenFileCommand = new RelayCommand(OpenFile);
+            SaveFileCommand = new RelayCommand(SaveFile);
+            SaveFileAsCommand = new RelayCommand(SaveFileAs);
 
             EditorTabs = new ObservableCollection<TabModel>()
             {
@@ -58,12 +62,75 @@ namespace Logavise
                 using StreamReader reader = new StreamReader(fs);
 
                 int newIndex = EditorTabs.Count;
-                EditorTabs.Add(new TabModel() { Header = openFileDialog.FileName, Index = newIndex, Text = reader.ReadToEnd() });
+                EditorTabs.Add(new TabModel()
+                {
+                    Header = Path.GetFileName(openFileDialog.FileName),
+                    Index = newIndex,
+                    Text = reader.ReadToEnd(),
+                    FileName = openFileDialog.FileName
+                });
                 tabControl.SelectedIndex = newIndex; // this automatically saves the current file then opens this file
             }
         }
 
         private void SaveFile()
+        {
+            // TODO: Implement saving a file to a specified filepath
+            //       Should automatically run Save As for a new file and Save for an existing file
+            var tab = EditorTabs[tabControl.SelectedIndex];
+            string filepath;
+            if (tab.FileName == null)
+            {
+                filepath = GetSaveFileName();
+                tab.FileName = filepath;
+            }
+            else
+            {
+                filepath = tab.FileName;
+            }
+
+            EditorTabs[tabControl.SelectedIndex].Text = textEditor.Text;
+
+            if (filepath != null)
+            {
+                File.WriteAllText(filepath, tab.Text);
+                string filename = Path.GetFileName(filepath);
+                if (filename != tab.Header)
+                {
+                    tab.Header = filename;
+                }
+            }
+        }
+
+        private void SaveFileAs()
+        {
+            var tab = EditorTabs[tabControl.SelectedIndex];
+            tab.FileName = null;
+            
+            SaveFile();
+        }
+
+        private string GetSaveFileName()
+        {
+            var saveFileDialog = new SaveFileDialog
+            {
+                Title = "Save File As",
+                Filter = "Text Documents (*.txt)|*.txt|Log Files (*.log)|*.log|All Files (*.*)|*.*",
+                DefaultExt = "txt",
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                OverwritePrompt = true,
+                AddExtension = true
+            };
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                return saveFileDialog.FileName;
+            }
+
+            return null;
+        }
+
+        private void _SaveFile()
         {
             if (textEditor.Text != "")
             {
@@ -72,7 +139,7 @@ namespace Logavise
             }
         }
 
-        private void LoadFile(int index)
+        private void _LoadFile(int index)
         {
             textEditor.Text = EditorTabs[index].Text;
         }
@@ -145,15 +212,14 @@ namespace Logavise
                     }
                 }
 
-                if (prevSelectedTabIndex > index)
-                {
-                    prevSelectedTabIndex--;
-                }
-
                 if (tabControl.SelectedIndex == index)
                 {
-                    SaveFile();
-                    LoadFile((index + 1) % EditorTabs.Count);
+                    _SaveFile();
+                    _LoadFile((index + 1) == EditorTabs.Count ? index - 1 : (index + 1) % EditorTabs.Count);
+                }
+                if (prevSelectedTabIndex >= index)
+                {
+                    prevSelectedTabIndex--;
                 }
                 EditorTabs.RemoveAt(index); // this has to come second because it kicks off tabControl_SelectionChanged.
             }
@@ -162,16 +228,16 @@ namespace Logavise
         private void tabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             int newIndex = (sender as TabControl).SelectedIndex;
-            if (newIndex != prevSelectedTabIndex)
-            {
-                SaveFile();
-            }
             if (newIndex >= 0)
             {
-                LoadFile(newIndex);
-
-                prevSelectedTabIndex = tabControl.SelectedIndex;
+                if (prevSelectedTabIndex >= 0 && newIndex != prevSelectedTabIndex)
+                {
+                    _SaveFile();
+                }
+                _LoadFile(newIndex);
             }
+
+            prevSelectedTabIndex = tabControl.SelectedIndex;
         }
 
         #endregion
