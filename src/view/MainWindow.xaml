@@ -19,6 +19,8 @@
         <KeyBinding Key="S" Modifiers="Ctrl" Command="{Binding SaveFileCommand}" />
         <KeyBinding Key="S" Modifiers="Ctrl+Alt" Command="{Binding SaveFileAsCommand}" />
         <KeyBinding Key="S" Modifiers="Ctrl+Shift" Command="{Binding SaveAllFilesCommand}" />
+        <KeyBinding Key="Tab" Modifiers="Ctrl+Shift" Command="{Binding PreviousTabCommand}" />
+        <KeyBinding Key="Tab" Modifiers="Ctrl" Command="{Binding NextTabCommand}" />
         <KeyBinding Key="W" Modifiers="Ctrl" Command="{Binding CloseFileCommand}" />
         <KeyBinding Key="W" Modifiers="Ctrl+Shift" Command="{Binding CloseAllFilesCommand}" />
     </Window.InputBindings>

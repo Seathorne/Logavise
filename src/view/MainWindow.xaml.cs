@@ -21,10 +21,11 @@ namespace Logavise
         public ICommand SaveFileCommand { get; private set; }
         public ICommand SaveFileAsCommand { get; private set; }
         public ICommand SaveAllFilesCommand { get; private set; }
+        public ICommand PreviousTabCommand { get; private set; }
+        public ICommand NextTabCommand { get; private set; }
         public ICommand CloseFileCommand { get; private set; }
         public ICommand CloseAllFilesCommand { get; private set; }
         public ICommand ExitCommand { get; private set; }
-
 
         public ObservableCollection<TabModel> EditorTabs { get; private set; }
 
@@ -38,28 +39,28 @@ namespace Logavise
             SaveFileCommand = new RelayCommand(SaveFile);
             SaveFileAsCommand = new RelayCommand(SaveFileAs);
             SaveAllFilesCommand = new RelayCommand(SaveAllFiles);
+            PreviousTabCommand = new RelayCommand(GoToPreviousTab);
+            NextTabCommand = new RelayCommand(GoToNextTab);
             CloseFileCommand = new RelayCommand(() => CloseFile(tabControl.SelectedIndex));
             CloseAllFilesCommand = new RelayCommand(CloseAllFiles);
             ExitCommand = new RelayCommand(Close); // close window
 
-            EditorTabs = new ObservableCollection<TabModel>()
-            {
-                new TabModel() { Header = "new 1", Index = 0, Text = "" }
-            };
+            EditorTabs = new ObservableCollection<TabModel>();
             tabControl.SelectedIndex = 0;
 
             textEditor.TextArea.Caret.PositionChanged += Caret_PositionChanged;
+
+            NewFile();
         }
 
         #region Private Methods
 
         private void NewFile()
         {
-            editorFilesNameIndex += 1;
-
             int newIndex = EditorTabs.Count;
             EditorTabs.Add(new TabModel() { Header = $"new {editorFilesNameIndex}", Index = newIndex, Text = "" });
             tabControl.SelectedIndex = newIndex; // this automatically saves the current file then switches to the new tab
+            editorFilesNameIndex++;
         }
 
         private void OpenFile()
@@ -151,6 +152,18 @@ namespace Logavise
             }
 
             return null;
+        }
+
+        private void GoToPreviousTab()
+        {
+            int index = tabControl.SelectedIndex;
+            tabControl.SelectedIndex = (index == 0) ? EditorTabs.Count - 1 : index - 1;
+        }
+
+        private void GoToNextTab()
+        {
+            int index = tabControl.SelectedIndex;
+            tabControl.SelectedIndex = (index + 1) % EditorTabs.Count;
         }
 
         private void CloseFile(int index)
@@ -275,6 +288,7 @@ namespace Logavise
             }
 
             prevSelectedTabIndex = tabControl.SelectedIndex;
+            Keyboard.Focus(textEditor);
         }
 
         private void textEditor_TextChanged(object sender, EventArgs e)
@@ -284,6 +298,10 @@ namespace Logavise
             {
                 tab.IsModified = true;
             }
+            //else if (tab.IsModified && tab.Text == textEditor.Text)
+            //{
+            //    tab.IsModified = false;
+            //}
         }
 
         #endregion
