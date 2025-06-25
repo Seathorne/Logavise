@@ -9,6 +9,7 @@ namespace Logavise
         private int _index;
         private string _text;
         private string _filepath = null;
+        private bool _isModified = false;
 
         public string Header
         {
@@ -46,6 +47,16 @@ namespace Logavise
             set
             {
                 _filepath = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool IsModified
+        {
+            get => _isModified;
+            set
+            {
+                _isModified = value;
                 OnPropertyChanged();
             }
         }

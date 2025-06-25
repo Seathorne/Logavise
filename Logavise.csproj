@@ -10,6 +10,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="src\img\cross-small.png" />
+    <None Remove="src\img\disk.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AvalonEdit" Version="6.3.1.120" />
   </ItemGroup>
 
@@ -18,6 +23,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="src\img\cross-small.png" />
+    <Resource Include="src\img\disk.png" />
   </ItemGroup>
 
 </Project>

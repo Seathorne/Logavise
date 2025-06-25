@@ -3,7 +3,6 @@
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -109,6 +108,8 @@ namespace Logavise
                 {
                     tab.Header = filename;
                 }
+
+                EditorTabs[tabControl.SelectedIndex].IsModified = false;
             }
         }
 
@@ -274,6 +275,15 @@ namespace Logavise
             }
 
             prevSelectedTabIndex = tabControl.SelectedIndex;
+        }
+
+        private void textEditor_TextChanged(object sender, EventArgs e)
+        {
+            var tab = EditorTabs[tabControl.SelectedIndex];
+            if (!tab.IsModified && tab.Text != textEditor.Text)
+            {
+                tab.IsModified = true;
+            }
         }
 
         #endregion
