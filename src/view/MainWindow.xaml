@@ -13,7 +13,10 @@
         <KeyBinding Key="N" Modifiers="Ctrl" Command="{Binding NewFileCommand}" />
         <KeyBinding Key="O" Modifiers="Ctrl" Command="{Binding OpenFileCommand}" />
         <KeyBinding Key="S" Modifiers="Ctrl" Command="{Binding SaveFileCommand}" />
-        <KeyBinding Key="S" Modifiers="Ctrl+Shift" Command="{Binding SaveFileAsCommand}" />
+        <KeyBinding Key="S" Modifiers="Ctrl+Alt" Command="{Binding SaveFileAsCommand}" />
+        <KeyBinding Key="S" Modifiers="Ctrl+Shift" Command="{Binding SaveAllFilesCommand}" />
+        <KeyBinding Key="W" Modifiers="Ctrl" Command="{Binding CloseFileCommand}" />
+        <KeyBinding Key="W" Modifiers="Ctrl+Shift" Command="{Binding CloseAllFilesCommand}" />
     </Window.InputBindings>
 
     <DockPanel Background="GhostWhite">
@@ -28,12 +31,23 @@
                 <MenuItem Command="{Binding SaveFileCommand}" Header="Save">
                     <MenuItem.InputGestureText>Ctrl+S</MenuItem.InputGestureText>
                 </MenuItem>
-                <MenuItem Header="Save As…" />
-                <MenuItem Header="Save All" />
-                <MenuItem Header="Close" />
+                <MenuItem Command="{Binding SaveFileAsCommand}" Header="Save As…">
+                    <MenuItem.InputGestureText>Ctrl+Alt+S</MenuItem.InputGestureText>
+                </MenuItem>
+                <MenuItem Command="{Binding SaveAllFilesCommand}" Header="Save All">
+                    <MenuItem.InputGestureText>Ctrl+Shift+S</MenuItem.InputGestureText>
+                </MenuItem>
+                <MenuItem Command="{Binding CloseFileCommand}" Header="Close">
+                    <MenuItem.InputGestureText>Ctrl+W</MenuItem.InputGestureText>
+                </MenuItem>
+                <MenuItem Command="{Binding CloseAllFilesCommand}" Header="Close All">
+                    <MenuItem.InputGestureText>Ctrl+Shift+W</MenuItem.InputGestureText>
+                </MenuItem>
                 <MenuItem Header="Recent Files" />
                 <Separator />
-                <MenuItem Header="Exit" />
+                <MenuItem Command="{Binding ExitCommand}" Header="Exit">
+                    <MenuItem.InputGestureText>Alt+F4</MenuItem.InputGestureText>
+                </MenuItem>
             </MenuItem>
             <MenuItem Header="_Edit">
                 <MenuItem Header="Cut" />
