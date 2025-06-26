@@ -3,6 +3,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -11,13 +12,21 @@ namespace Logavise
 {
     public partial class MainWindow : Window
     {
+
+        #region Private Fields
+
         private int previousLineNumber;
         
         private int editorFilesNameIndex = 1;
         private int prevSelectedTabIndex = 0;
 
+        #endregion
+
+        #region Public Properties
+
         public ICommand NewFileCommand { get; private set; }
         public ICommand OpenFileCommand { get; private set; }
+        public ICommand OpenFileAsyncCommand { get; private set; }
         public ICommand SaveFileCommand { get; private set; }
         public ICommand SaveFileAsCommand { get; private set; }
         public ICommand SaveAllFilesCommand { get; private set; }
@@ -29,6 +38,10 @@ namespace Logavise
 
         public ObservableCollection<TabModel> EditorTabs { get; private set; }
 
+        #endregion
+
+        #region Public Constructors
+
         public MainWindow()
         {
             InitializeComponent();
@@ -36,6 +49,7 @@ namespace Logavise
 
             NewFileCommand = new RelayCommand(NewFile);
             OpenFileCommand = new RelayCommand(OpenFile);
+            OpenFileAsyncCommand = new AsyncRelayCommand(OpenFileAsync);
             SaveFileCommand = new RelayCommand(SaveFile);
             SaveFileAsCommand = new RelayCommand(SaveFileAs);
             SaveAllFilesCommand = new RelayCommand(SaveAllFiles);
@@ -52,6 +66,8 @@ namespace Logavise
 
             NewFile();
         }
+
+        #endregion
 
         #region Private Methods
 
@@ -81,6 +97,24 @@ namespace Logavise
                 });
                 tabControl.SelectedIndex = newIndex; // this automatically saves the current file then opens this file
             }
+        }
+
+        private async Task OpenFileAsync()
+        {
+            string fileName = MainWindow.GetFileName();
+
+            if (fileName == null) return;
+
+            else
+            {
+                using FileStream stream = new FileStream(fileName, FileMode.Open,
+                    FileAccess.ReadWrite, FileShare.ReadWrite, 65536, useAsync: true);
+                using StreamReader reader = new StreamReader(stream);
+
+                EditorTabs.Add(new TabModel(fileName, index: EditorTabs.Count));
+                tabControl.SelectedIndex = EditorTabs.Count - 1;
+                textEditor.Text = await reader.ReadToEndAsync();
+            };
         }
 
         private void SaveFile()
@@ -231,7 +265,21 @@ namespace Logavise
 
         #endregion
 
-        #region Event Handlers
+        #region Private Static Methods
+
+        private static string GetFileName()
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            if (openFileDialog.ShowDialog() == true)
+            {
+                return openFileDialog.FileName;
+            }
+            else return null;
+        }
+
+        #endregion
+
+        #region Private Event Handlers
 
         private void Caret_PositionChanged(object sender, EventArgs e)
         {

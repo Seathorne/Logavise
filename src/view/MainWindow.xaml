@@ -14,15 +14,46 @@
     </Window.Resources>
 
     <Window.InputBindings>
-        <KeyBinding Key="N" Modifiers="Ctrl" Command="{Binding NewFileCommand}" />
-        <KeyBinding Key="O" Modifiers="Ctrl" Command="{Binding OpenFileCommand}" />
-        <KeyBinding Key="S" Modifiers="Ctrl" Command="{Binding SaveFileCommand}" />
-        <KeyBinding Key="S" Modifiers="Ctrl+Alt" Command="{Binding SaveFileAsCommand}" />
-        <KeyBinding Key="S" Modifiers="Ctrl+Shift" Command="{Binding SaveAllFilesCommand}" />
-        <KeyBinding Key="Tab" Modifiers="Ctrl+Shift" Command="{Binding PreviousTabCommand}" />
-        <KeyBinding Key="Tab" Modifiers="Ctrl" Command="{Binding NextTabCommand}" />
-        <KeyBinding Key="W" Modifiers="Ctrl" Command="{Binding CloseFileCommand}" />
-        <KeyBinding Key="W" Modifiers="Ctrl+Shift" Command="{Binding CloseAllFilesCommand}" />
+        <KeyBinding
+            Key="N"
+            Command="{Binding NewFileCommand}"
+            Modifiers="Ctrl" />
+        <KeyBinding
+            Key="O"
+            Command="{Binding OpenFileCommand}"
+            Modifiers="Ctrl" />
+        <KeyBinding
+            Key="O"
+            Command="{Binding OpenFileAsyncCommand}"
+            Modifiers="Ctrl+Alt" />
+        <KeyBinding
+            Key="S"
+            Command="{Binding SaveFileCommand}"
+            Modifiers="Ctrl" />
+        <KeyBinding
+            Key="S"
+            Command="{Binding SaveFileAsCommand}"
+            Modifiers="Ctrl+Alt" />
+        <KeyBinding
+            Key="S"
+            Command="{Binding SaveAllFilesCommand}"
+            Modifiers="Ctrl+Shift" />
+        <KeyBinding
+            Key="Tab"
+            Command="{Binding PreviousTabCommand}"
+            Modifiers="Ctrl+Shift" />
+        <KeyBinding
+            Key="Tab"
+            Command="{Binding NextTabCommand}"
+            Modifiers="Ctrl" />
+        <KeyBinding
+            Key="W"
+            Command="{Binding CloseFileCommand}"
+            Modifiers="Ctrl" />
+        <KeyBinding
+            Key="W"
+            Command="{Binding CloseAllFilesCommand}"
+            Modifiers="Ctrl+Shift" />
     </Window.InputBindings>
 
     <DockPanel Background="GhostWhite">
@@ -33,6 +64,9 @@
                 </MenuItem>
                 <MenuItem Command="{Binding OpenFileCommand}" Header="_Open…">
                     <MenuItem.InputGestureText>Ctrl+O</MenuItem.InputGestureText>
+                </MenuItem>
+                <MenuItem Command="{Binding OpenFileAsyncCommand}" Header="_Open Asynchronously…">
+                    <MenuItem.InputGestureText>Ctrl+Alt+O</MenuItem.InputGestureText>
                 </MenuItem>
                 <MenuItem Command="{Binding SaveFileCommand}" Header="Save">
                     <MenuItem.InputGestureText>Ctrl+S</MenuItem.InputGestureText>
@@ -96,9 +130,7 @@
                         ShowLineNumbers="True" />
                 </Border>
 
-                <Grid
-                    Grid.Row="1"
-                    Margin="0,8,0,0">
+                <Grid Grid.Row="1" Margin="0,8,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="60" />
@@ -109,12 +141,16 @@
                         Padding="0,0,0,0"
                         Background="DarkGray">
                         <TextBox
-                            Grid.Column="0"
                             x:Name="consoleLine"
-                            KeyDown="consoleLine_KeyDown"/>
+                            Grid.Column="0"
+                            KeyDown="consoleLine_KeyDown" />
                     </Border>
 
-                    <Button Grid.Column="1" Margin="2,0,0,0" Height="20" Width="Auto" >
+                    <Button
+                        Grid.Column="1"
+                        Width="Auto"
+                        Height="20"
+                        Margin="2,0,0,0">
                         <Image Source="/src/img/arrow-right.png" />
                     </Button>
                 </Grid>
@@ -136,8 +172,14 @@
                     <TabControl.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Height="Auto" Orientation="Horizontal">
-                                <Border Height="14" Margin="0,-5,4,0" Background="{Binding IsModified, Converter={StaticResource saveFileIconConverter}, ConverterParameter='Red|CornflowerBlue'}">
-                                    <Image Height="14" Width="14" Source="/src/img/disk.png" />
+                                <Border
+                                    Height="14"
+                                    Margin="0,-5,4,0"
+                                    Background="{Binding IsModified, Converter={StaticResource saveFileIconConverter}, ConverterParameter='Red|CornflowerBlue'}">
+                                    <Image
+                                        Width="14"
+                                        Height="14"
+                                        Source="/src/img/disk.png" />
                                 </Border>
                                 <TextBlock
                                     Height="24"
@@ -171,8 +213,7 @@
                         FontFamily="Consolas"
                         HorizontalScrollBarVisibility="Auto"
                         ShowLineNumbers="True"
-                        TextChanged="textEditor_TextChanged"
-                        />
+                        TextChanged="textEditor_TextChanged" />
                 </Border>
             </Grid>
 

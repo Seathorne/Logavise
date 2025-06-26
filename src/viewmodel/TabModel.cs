@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.IO;
 using System.Runtime.CompilerServices;
 
 namespace Logavise
@@ -10,6 +11,17 @@ namespace Logavise
         private string _text;
         private string _filepath = null;
         private bool _isModified = false;
+
+        public TabModel()
+        {
+        }
+
+        public TabModel(string fileName, int index)
+        {
+            FileName = fileName;
+            Header = Path.GetFileName(fileName);
+            Index = index;
+        }
 
         public string Header
         {
