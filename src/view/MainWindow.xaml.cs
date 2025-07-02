@@ -1,5 +1,5 @@
 ﻿using Microsoft.Win32;
-
+using LogParser;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -12,13 +12,14 @@ namespace Logavise
 {
     public partial class MainWindow : Window
     {
-
         #region Private Fields
 
         private int previousLineNumber;
         
         private int editorFilesNameIndex = 1;
         private int prevSelectedTabIndex = 0;
+
+        private readonly LogReader logReader = new() { TimeZone = TimeZoneInfo.Local };
 
         #endregion
 
@@ -63,6 +64,8 @@ namespace Logavise
             tabControl.SelectedIndex = 0;
 
             textEditor.TextArea.Caret.PositionChanged += Caret_PositionChanged;
+
+            logReader.Console.OnWriteLine += OnReaderConsoleWriteLine;
 
             NewFile();
         }
@@ -350,6 +353,21 @@ namespace Logavise
             //{
             //    tab.IsModified = false;
             //}
+        }
+
+        private void OnReaderConsoleWriteLine(object sender, LogReaderEventArgs e)
+        {
+            consoleEditor.AppendText(e.Line + Environment.NewLine);
+            consoleEditor.ScrollToEnd();
+        }
+
+        private void OnProcessButtonClicked(object sender, RoutedEventArgs e)
+        {
+            string fileName = EditorTabs[tabControl.SelectedIndex].FileName;
+            if (fileName != null)
+            {
+                logReader.ProcessFile(fileName);
+            }
         }
 
         #endregion

@@ -26,6 +26,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\LogReader\LogParser.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Resource Include="src\img\cross-small.png" />
     <Resource Include="src\img\disk.png" />
   </ItemGroup>
